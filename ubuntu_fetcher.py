@@ -54,56 +54,8 @@ def main():
             fetch_image(url)
 
 
-
-def group_similar_images(folder="Fetched_Images", hash_size=8, threshold=5):
-    """
-    Groups similar images in the specified folder using perceptual hashing.
-    Each group is placed in a subfolder named 'group_X'.
-    """
-    import imagehash
-    from PIL import Image
-    from collections import defaultdict
-
-    # Collect image files
-    image_files = [f for f in os.listdir(folder) if f.lower().endswith((".jpg", ".jpeg", ".png", ".bmp", ".gif"))]
-    hashes = []
-    groups = defaultdict(list)
-    group_id = 1
-
-    for img_file in image_files:
-        img_path = os.path.join(folder, img_file)
-        try:
-            with Image.open(img_path) as img:
-                img_hash = imagehash.average_hash(img, hash_size=hash_size)
-        except Exception as e:
-            print(f"Could not process {img_file}: {e}")
-            continue
-
-        # Try to find a similar hash in existing groups
-        found_group = False
-        for h, gid in hashes:
-            if img_hash - h <= threshold:
-                groups[gid].append(img_file)
-                found_group = True
-                break
-        if not found_group:
-            hashes.append((img_hash, group_id))
-            groups[group_id].append(img_file)
-            group_id += 1
-
-    # Move files into group folders
-    for gid, files in groups.items():
-        group_folder = os.path.join(folder, f"group_{gid}")
-        os.makedirs(group_folder, exist_ok=True)
-        for f in files:
-            src = os.path.join(folder, f)
-            dst = os.path.join(group_folder, f)
-            if not os.path.exists(dst):
-                os.rename(src, dst)
-    print(f"\nGrouped {len(image_files)} images into {len(groups)} groups.")
-
-
 if __name__ == "__main__":
     main()
     # After fetching, group similar images
     group_similar_images()
+
