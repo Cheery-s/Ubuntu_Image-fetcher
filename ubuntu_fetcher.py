@@ -56,6 +56,7 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # After fetching, group similar images
-    group_similar_images()
+    
+    
+
 
